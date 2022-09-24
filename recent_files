@@ -51,6 +51,12 @@ class FindRecentFiles:
             required=False,
             help='Path to Git-format ignore file for search exclusions, optional')
         parser.add_argument(
+            '-l', '--limit',
+            type=int,
+            default=-1,
+            required=False,
+            help='Limit number of results')
+        parser.add_argument(
             '-o', '--output-format',
             dest='output_format',
             choices=['json', 'text'],
@@ -83,6 +89,7 @@ class FindRecentFiles:
         '''Run the fd command, parse the result, and get file mtime values'''
         files = {}
         options = self._set_options()
+        result_count = 0
 
         result = subprocess.Popen(
             [FD_COMMAND, *options],
@@ -90,8 +97,11 @@ class FindRecentFiles:
             cwd=self.arguments['dir'])
 
         for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
+            result_count += 1
             filename = line.rstrip('\n')
             files[filename] = os.stat(filename).st_mtime
+            if self.arguments['limit'] == result_count:
+                break
 
         return files
 
