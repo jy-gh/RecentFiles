@@ -114,7 +114,6 @@ class FindRecentFiles:
             record = {
                 'type': 'file',
                 'title': filename,
-                'subtitle': filename,
                 'arg': filename
             }
             files.append(record)
