@@ -51,8 +51,8 @@ class FindRecentFiles:
             dest='output_format',
             choices=['json', 'text'],
             required=False,
-            default='json',
-            help='Output format')
+            default='text',
+            help='Output format, default is text')
         parser.add_argument(
             '--changed-within',
             dest='changed_within',
