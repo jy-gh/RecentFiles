@@ -110,7 +110,9 @@ class FindRecentFiles:
 
         print(json.dumps(items))
 
-    def create_text(self, sorted_list):
+    @staticmethod
+    def create_text(sorted_list):
+        '''Prepare and return plain text output'''
         for list_item in sorted_list:
             print(list_item[0])
 
