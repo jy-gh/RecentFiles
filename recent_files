@@ -41,6 +41,13 @@ class FindRecentFiles:
             required=False,
             help='Path to ignore file for search exclusions, optional')
         parser.add_argument(
+            '-o', '--output-format',
+            dest='output_format',
+            choices=['json', 'text'],
+            required=False,
+            default='json',
+            help='Output format')
+        parser.add_argument(
             '--changed-within',
             dest='changed_within',
             default='7d',
@@ -100,13 +107,19 @@ class FindRecentFiles:
 
         print(json.dumps(items))
 
+    def create_text(self, sorted_list):
+        for list_item in sorted_list:
+            print(list_item[0])
 
     def run(self):
         '''Main program'''
 
         files = self.find_recent_files()
         sorted_list = sorted(files.items(), key=lambda x:x[1], reverse=True)
-        self.create_json(sorted_list)
+        if self.arguments['output_format'] == 'json':
+            self.create_json(sorted_list)
+        else:
+            self.create_text(sorted_list)
 
 
 if __name__ == '__main__':
