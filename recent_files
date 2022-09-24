@@ -25,6 +25,9 @@ class FindRecentFiles:
 
         self._parse_arguments()
 
+        if 'dir' not in self.arguments:
+            self.arguments['dir'] = os.getcwd()
+
         if 'type' not in self.arguments:
             self.arguments['filetype'] = FD_DEFAULT_FILETYPE
 
@@ -36,9 +39,8 @@ class FindRecentFiles:
         parser = argparse.ArgumentParser(description='Finds recent files')
         parser.add_argument(
             '-d', '--dir',
-            default=os.path.expandvars('$HOME'),
             required=False,
-            help='Top-level directory to start search from, default is $HOME')
+            help='Directory to start search from, default is the current directory')
         parser.add_argument(
             '--ignore-file',
             type=str,
