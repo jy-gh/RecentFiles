@@ -34,6 +34,13 @@ class FindRecentFiles:
         '''Parses command line arguments'''
         parser = argparse.ArgumentParser(description='Finds recent files')
         parser.add_argument(
+            '-c', '--changed-within',
+            dest='changed_within',
+            default='7d',
+            type=str,
+            required=False,
+            help='Changed within 1h, 2d, 5min, etc., default is 7d')
+        parser.add_argument(
             '-d', '--dir',
             required=False,
             help='Directory to start search from, default is the current directory')
@@ -50,13 +57,6 @@ class FindRecentFiles:
             required=False,
             default='text',
             help='Output format, default is text')
-        parser.add_argument(
-            '--changed-within',
-            dest='changed_within',
-            default='7d',
-            type=str,
-            required=False,
-            help='Changed within 1h, 2d, 5min, etc., default is 7d')
 
         parsed_arguments = parser.parse_args()
         self.arguments = vars(parsed_arguments)
