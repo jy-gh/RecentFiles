@@ -1,0 +1,113 @@
+#! /opt/local/bin/python3.7
+#! /usr/bin/env python
+
+import argparse
+import io
+import json
+import os
+import subprocess
+
+from pprint import pprint
+
+FD_COMMAND = '/opt/local/bin/fd'
+FD_IGNORE_FILE = '/Users/jyakich/bin/recent_files_exclude_list.txt'
+FD_DEFAULT_FILETYPE = 'f'
+
+class FindRecentFiles:
+    '''Uses the fd command to find recent files'''
+
+    def __init__(self):
+        '''Initialize variables'''
+
+        self._parse_arguments()
+
+        if 'type' not in self.arguments:
+            self.arguments['filetype'] = FD_DEFAULT_FILETYPE
+
+        if 'ignore-file' not in self.arguments:
+            self.arguments['ignore-file'] = FD_IGNORE_FILE
+
+    def _parse_arguments(self):
+        '''Parses command line arguments'''
+        parser = argparse.ArgumentParser(description='Finds recent files')
+        parser.add_argument(
+            '-d', '--dir',
+            default=os.path.expandvars('$HOME'),
+            required=False,
+            help='Top-level directory to start search from, default is $HOME')
+        parser.add_argument(
+            '--ignore-file',
+            type=str,
+            required=False,
+            help='Path to ignore file for search exclusions, optional')
+        parser.add_argument(
+            '--changed-within',
+            dest='changed_within',
+            default='7d',
+            type=str,
+            required=False,
+            help='Changed within 1h, 2d, 5min, etc., default is 7d')
+
+        parsed_arguments = parser.parse_args()
+        self.arguments = vars(parsed_arguments)
+        # pprint(self.arguments)
+
+    def _set_options(self):
+        options = []
+
+        options.append('-a')
+        options.append('--changed-within')
+        options.append(self.arguments['changed_within'])
+        options.append('-t')
+        options.append(self.arguments['filetype'])
+        options.append('--ignore-file')
+        options.append(self.arguments['ignore-file'])
+
+        # pprint(options)
+        # quit()
+
+        return options
+
+    def find_recent_files(self):
+        files = {}
+        options = self._set_options()
+        result = subprocess.Popen(
+            [FD_COMMAND, *options],
+            stdout=subprocess.PIPE,
+            cwd=self.arguments['dir'])
+
+        for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
+            filename = line.rstrip('\n')
+            file_stat = os.stat(filename)
+            files[filename] = int(file_stat.st_mtime)
+
+        return files
+
+    def create_json(self, sorted_list):
+        files = []
+        for list_item in sorted_list:
+            filename = list_item[0]
+            record = {
+                'type': 'file',
+                'title': filename,
+                'subtitle': filename,
+                'arg': filename
+            }
+            files.append(record)
+
+        items = { 'items': files }
+
+        print(json.dumps(items))
+
+
+    def run(self):
+        '''Main program'''
+
+        files = self.find_recent_files()
+        sorted_list = sorted(files.items(), key=lambda x:x[1], reverse=True)
+        self.create_json(sorted_list)
+
+
+if __name__ == '__main__':
+    program = FindRecentFiles()
+    program.run()
