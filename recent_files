@@ -87,8 +87,7 @@ class FindRecentFiles:
 
         for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
             filename = line.rstrip('\n')
-            file_stat = os.stat(filename)
-            files[filename] = int(file_stat.st_mtime)
+            files[filename] = os.stat(filename).st_mtime
 
         return files
 
