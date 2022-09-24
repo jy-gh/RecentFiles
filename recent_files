@@ -66,8 +66,10 @@ class FindRecentFiles:
         options = []
 
         options.append('-a')
+
         options.append('--changed-within')
         options.append(self.arguments['changed_within'])
+
         options.append('-t')
         options.append(self.arguments['filetype'])
 
@@ -81,6 +83,7 @@ class FindRecentFiles:
         '''Run the fd command, parse the result, and get file mtime values'''
         files = {}
         options = self._set_options()
+
         result = subprocess.Popen(
             [FD_COMMAND, *options],
             stdout=subprocess.PIPE,
