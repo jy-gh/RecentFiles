@@ -79,7 +79,7 @@ class FindRecentFiles:
         options.append('-t')
         options.append(self.arguments['filetype'])
 
-        if 'ignore_file' in self.arguments and self.arguments['ignore_file'] != None:
+        if 'ignore_file' in self.arguments and self.arguments['ignore_file'] is not None:
             options.append('--ignore-file')
             options.append(self.arguments['ignore_file'])
 
