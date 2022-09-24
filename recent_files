@@ -24,7 +24,7 @@ class FindRecentFiles:
 
         self._parse_arguments()
 
-        if 'dir' not in self.arguments:
+        if self.arguments['dir'] is None:
             self.arguments['dir'] = os.getcwd()
 
         if 'type' not in self.arguments:
