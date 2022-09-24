@@ -14,7 +14,6 @@ import os
 import subprocess
 
 FD_COMMAND = '/opt/local/bin/fd'
-FD_IGNORE_FILE = '/Users/jyakich/bin/recent_files_exclude_list.txt'
 FD_DEFAULT_FILETYPE = 'f'
 
 class FindRecentFiles:
@@ -31,9 +30,6 @@ class FindRecentFiles:
         if 'type' not in self.arguments:
             self.arguments['filetype'] = FD_DEFAULT_FILETYPE
 
-        if 'ignore-file' not in self.arguments:
-            self.arguments['ignore-file'] = FD_IGNORE_FILE
-
     def _parse_arguments(self):
         '''Parses command line arguments'''
         parser = argparse.ArgumentParser(description='Finds recent files')
@@ -43,6 +39,7 @@ class FindRecentFiles:
             help='Directory to start search from, default is the current directory')
         parser.add_argument(
             '--ignore-file',
+            dest='ignore_file',
             type=str,
             required=False,
             help='Path to Git-format ignore file for search exclusions, optional')
@@ -73,8 +70,10 @@ class FindRecentFiles:
         options.append(self.arguments['changed_within'])
         options.append('-t')
         options.append(self.arguments['filetype'])
-        options.append('--ignore-file')
-        options.append(self.arguments['ignore-file'])
+
+        if 'ignore_file' in self.arguments and self.arguments['ignore_file'] != None:
+            options.append('--ignore-file')
+            options.append(self.arguments['ignore_file'])
 
         return options
 
