@@ -53,6 +53,7 @@ class FindRecentFiles:
         # pprint(self.arguments)
 
     def _set_options(self):
+        '''Set up the command line options for the fd command'''
         options = []
 
         options.append('-a')
