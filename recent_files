@@ -45,7 +45,7 @@ class FindRecentFiles:
             required=False,
             help='Directory to start search from, default is the current directory')
         parser.add_argument(
-            '--ignore-file',
+            '-i', '--ignore-file',
             dest='ignore_file',
             type=str,
             required=False,
