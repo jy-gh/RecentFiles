@@ -43,7 +43,7 @@ class FindRecentFiles:
             '--ignore-file',
             type=str,
             required=False,
-            help='Path to ignore file for search exclusions, optional')
+            help='Path to Git-format ignore file for search exclusions, optional')
         parser.add_argument(
             '-o', '--output-format',
             dest='output_format',
