@@ -1,6 +1,12 @@
 #! /opt/local/bin/python3.7
 #! /usr/bin/env python
 
+'''
+Shows recently modified files, after applying an exclude filter,
+in either JSON or text format. The JSON format is used for an
+Alfred workflow.
+'''
+
 import argparse
 import io
 import json
