@@ -13,8 +13,6 @@ import json
 import os
 import subprocess
 
-from pprint import pprint
-
 FD_COMMAND = '/opt/local/bin/fd'
 FD_IGNORE_FILE = '/Users/jyakich/bin/recent_files_exclude_list.txt'
 FD_DEFAULT_FILETYPE = 'f'
