@@ -92,7 +92,9 @@ class FindRecentFiles:
 
         return files
 
-    def create_json(self, sorted_list):
+    @staticmethod
+    def create_json(sorted_list):
+        '''Prepare and return JSON output'''
         files = []
         for list_item in sorted_list:
             filename = list_item[0]
