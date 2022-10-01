@@ -96,9 +96,10 @@ class FindRecentFiles:
             stdout=subprocess.PIPE,
             cwd=self.arguments['dir'])
 
-        for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
+        for line in io.TextIOWrapper(result.stdout, encoding="utf-8", newline=''):
             result_count += 1
             filename = line.rstrip('\n')
+
             files[filename] = os.stat(filename).st_mtime
             if self.arguments['limit'] == result_count:
                 break
