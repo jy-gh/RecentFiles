@@ -10,45 +10,59 @@ Output may be text or JSON. JSON output was intended for use by an Alfred workfl
 
 Both Python 3 and *fd(1)* are required to run this application. Both can be installed from a variety of sources, including Brew, MacPorts, and direct downloads of the executables for your platform.
 
+The default location specified in the script for fd(1) is `/opt/local/bin/fd`. This can be overridden with the command line argument `--fd-command`. See below.
+
 ## Installation
 
-Copy *recent_files* to a directory in your $PATH, such as ~/bin or wherever user scripts are located.
+Copy *recent_files* to a directory in your $PATH, such as `~/bin` or wherever user scripts are located.
 
 ## Usage
 
-```sh
-usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIR] [-i IGNORE_FILE] [-l LIMIT]
-                    [-o {json,text}]
+```
+usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIR] [-H] [-i IGNORE_FILE]
+                    [--fd-command FD_COMMAND] [-l LIMIT] [-o {text,json}] [-t {f,d,l,s,p,x,e}]
 
 Finds recent files
 
 optional arguments:
-
   -h, --help            show this help message and exit
   -c CHANGED_WITHIN, --changed-within CHANGED_WITHIN
-                        Changed within 1h, 2d, 5min, etc., default is 7d
-  -d DIR, --dir DIR     Directory to start search from, default is the current directory
+                        Changed within 1h, 2d, 5min, etc.; the default is 7d
+  -d DIR, --dir DIR     Directory to start search from, the default is the current directory
+  -H, --hidden          Show hidden files; the default is not to show hidden files
   -i IGNORE_FILE, --ignore-file IGNORE_FILE
-                        Path to Git-format ignore file for search exclusions, optional
+                        Path to the Git-format ignore file for search exclusions, optional
+  --fd-command FD_COMMAND
+                        Path to the fd(1) command; the default is /opt/local/bin/fd
   -l LIMIT, --limit LIMIT
                         Limit number of results
-  -o {json,text}, --output-format {json,text}
+  -o {text,json}, --output-format {text,json}
                         Output format, default is text
+  -t {f,d,l,s,p,x,e}, --filetype {f,d,l,s,p,x,e}
+                        Filetype, as supported by fd(1), default is "f"
 ```
 
 ## Examples
 
 List files modified within the past day:
 
-	recent_files --changed_within 1d
+```recent_files --changed_within 1d```
 
 List files modified in the past week, in the Documents folder:
 
-	recent_files -c 1w --dir ~/Documents
+```recent_files -c 1w --dir ~/Documents```
+
+List files modified in the past hour, including hidden files:
+
+```recent_files -c 1h -H```
 
 Use a custom ignore file, return JSON output:
 
-	recent_files --ignore-file ~/my_ignore_file -o json
+```recent_files --ignore-file ~/my_ignore_file -o json```
+
+Specify a different location for the fd(1) command:
+
+```recent_files --fd-command /some/path/to/fd/command```
 
 ## Ignore File
 
@@ -56,7 +70,7 @@ Use a custom ignore file, return JSON output:
 
 Here's an example ignore file:
 
-```sh
+```
 Library
 ~*
 *.jpg
@@ -65,7 +79,7 @@ Library
 
 This ignore file will cause *fd(1)* to ignore files in the Library folder, files beginning with the '~' character (often used for temporary files), .jpg image files, and .mov movie files. Files matched in an ignore file will not be returned as results.
 
-If this file was named ```my_ignore_file``` and put in the $HOME directory, the following command line would allow *recent_files* to reference it:
+If this file was named `my_ignore_file` and put in the $HOME directory, the following command line would allow *recent_files* to reference it:
 
 ```recent_files --ignore-file $HOME/my_ignore_file```
 
@@ -82,17 +96,19 @@ See [Script Filter JSON Format](https://www.alfredapp.com/help/workflows/inputs/
       "type": "file",
       "title": "/Users/j/Documents/foo.txt",
       "arg": "/Users/j/Documents/foo.txt"
+      "subtitle": "/Users/j/Documents/foo.txt",
     },
     {
       "type": "file",
       "title": "/Users/j/Documents/bar.txt",
+      "subtitle": "/Users/j/Documents/bar.txt",
       "arg": "/Users/j/Documents/bar.txt"
     }
   ]
 }
 ```
 
-Note that *recent_files* does not populate the following properties, as they are extraneous: **uid**, **subtitle**, **autocomplete**, and **icon**.
+Note that *recent_files* does not populate the following properties, as they are extraneous: **uid**, **autocomplete**, and **icon**.
 
 ## Background
 
