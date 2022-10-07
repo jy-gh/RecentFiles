@@ -54,6 +54,13 @@ class FindRecentFiles:
             required=False,
             help='Directory to start search from, the default is the current directory')
         parser.add_argument(
+            '-H', '--hidden',
+            dest='show_hidden',
+            default=False,
+            action='store_true',
+            required=False,
+            help='Show hidden files; the default is not to show hidden files')
+        parser.add_argument(
             '-i', '--ignore-file',
             dest='ignore_file',
             type=str,
@@ -105,6 +112,9 @@ class FindRecentFiles:
         if 'ignore_file' in self.arguments and self.arguments['ignore_file'] is not None:
             options.append('--ignore-file')
             options.append(self.arguments['ignore_file'])
+
+        if 'show_hidden' in self.arguments and self.arguments['show_hidden']:
+            options.append('-H')
 
         return options
 
