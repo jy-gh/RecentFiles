@@ -11,6 +11,7 @@ import io
 import json
 import os
 import subprocess
+import sys
 
 FD_COMMAND = '/opt/local/bin/fd'
 FD_DEFAULT_FILETYPE = 'f'
@@ -29,6 +30,14 @@ class FindRecentFiles:
         if self.arguments['filetypes'] is None:
             self.arguments['filetypes'] = []
             self.arguments['filetypes'].append(FD_DEFAULT_FILETYPE)
+
+        if self.arguments['fd_command'] is None:
+            self.arguments['fd_command'] = FD_COMMAND
+
+        if not os.access(self.arguments['fd_command'], os.X_OK):
+            print("Error: the configured fd command is not executable!")
+            print("  " + self.arguments['fd_command'])
+            sys.exit(1)
 
     def _parse_arguments(self):
         '''Parses command line arguments'''
@@ -49,7 +58,12 @@ class FindRecentFiles:
             dest='ignore_file',
             type=str,
             required=False,
-            help='Path to Git-format ignore file for search exclusions, optional')
+        parser.add_argument(
+            '--fd-command',
+            dest='fd_command',
+            type=str,
+            required=False,
+            help='Path to the fd(1) command; the default is ' + FD_COMMAND)
         parser.add_argument(
             '-l', '--limit',
             type=int,
@@ -100,7 +114,7 @@ class FindRecentFiles:
         result_count = 0
 
         result = subprocess.Popen(
-            [FD_COMMAND, *options],
+            [self.arguments['fd_command'], *options],
             stdout=subprocess.PIPE,
             cwd=self.arguments['dir'])
 
