@@ -35,11 +35,11 @@ class FindRecentFiles:
             default='7d',
             type=str,
             required=False,
-            help='Changed within 1h, 2d, 5min, etc., default is 7d')
+            help='Changed within 1h, 2d, 5min, etc.; the default is 7d')
         parser.add_argument(
             '-d', '--dir',
             required=False,
-            help='Directory to start search from, default is the current directory')
+            help='Directory to start search from, the default is the current directory')
         parser.add_argument(
             '-i', '--ignore-file',
             dest='ignore_file',
@@ -55,7 +55,7 @@ class FindRecentFiles:
         parser.add_argument(
             '-o', '--output-format',
             dest='output_format',
-            choices=['json', 'text'],
+            choices=['text', 'json'],
             required=False,
             default='text',
             help='Output format, default is text')
