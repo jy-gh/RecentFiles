@@ -58,6 +58,7 @@ class FindRecentFiles:
             dest='ignore_file',
             type=str,
             required=False,
+            help='Path to the Git-format ignore file for search exclusions, optional')
         parser.add_argument(
             '--fd-command',
             dest='fd_command',
