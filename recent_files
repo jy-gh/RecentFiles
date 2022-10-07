@@ -26,9 +26,6 @@ class FindRecentFiles:
         if self.arguments['dir'] is None:
             self.arguments['dir'] = os.getcwd()
 
-        if 'type' not in self.arguments:
-            self.arguments['filetype'] = FD_DEFAULT_FILETYPE
-
     def _parse_arguments(self):
         '''Parses command line arguments'''
         parser = argparse.ArgumentParser(description='Finds recent files')
@@ -62,6 +59,13 @@ class FindRecentFiles:
             required=False,
             default='text',
             help='Output format, default is text')
+        parser.add_argument(
+            '-t', '--filetype',
+            dest='filetypes',
+            choices=['f', 'd', 'l', 's', 'p', 'x', 'e'],
+            required=False,
+            action='append',
+            help='Filetype, as supported by fd(1), default is "f"')
 
         parsed_arguments = parser.parse_args()
         self.arguments = vars(parsed_arguments)
@@ -75,8 +79,13 @@ class FindRecentFiles:
         options.append('--changed-within')
         options.append(self.arguments['changed_within'])
 
-        options.append('-t')
-        options.append(self.arguments['filetype'])
+        if self.arguments['filetypes'] is None:
+            self.arguments['filetypes'] = []
+            self.arguments['filetypes'].append(FD_DEFAULT_FILETYPE)
+
+        for filetype in self.arguments['filetypes']:
+            options.append('-t')
+            options.append(filetype)
 
         if 'ignore_file' in self.arguments and self.arguments['ignore_file'] is not None:
             options.append('--ignore-file')
