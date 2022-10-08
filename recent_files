@@ -1,9 +1,8 @@
 #! /usr/bin/env python3
 
 '''
-Shows recently modified files, after applying an exclude filter,
-in either JSON or text format. The JSON format is used for an
-Alfred workflow.
+Shows recently modified files in either JSON or text format.
+The JSON format is used for an Alfred workflow.
 '''
 
 import argparse
@@ -180,7 +179,6 @@ class FindRecentFiles:
 
         for list_item in sorted_list:
 
-            # Check at start of loop, since limit can be 0
             if result_count == limit:
                 break
 
