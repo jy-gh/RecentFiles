@@ -146,10 +146,14 @@ class FindRecentFiles:
         for list_item in sorted_list:
             filename = list_item[0]
             record = {
-                'type': 'file',
+                'type': "file",
                 'title': filename,
                 'subtitle': filename,
                 'arg': filename,
+                "icon": {
+                    "type": "fileicon",
+                    "path": filename
+                }
             }
             files.append(record)
 
