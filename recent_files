@@ -122,7 +122,6 @@ class FindRecentFiles:
         '''Run the fd command, parse the result, and get file mtime values'''
         files = {}
         options = self._set_options()
-        result_count = 0
 
         result = subprocess.Popen(
             [self.arguments['fd_command'], *options],
@@ -130,7 +129,6 @@ class FindRecentFiles:
             cwd=self.arguments['dir'])
 
         for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
-            result_count += 1
 
             # Universal newlines are on, and io.TextIOWrapper will translate
             # end of line characters to '\n'; however, it seems wise to ensure
@@ -138,16 +136,23 @@ class FindRecentFiles:
             filename = line.rstrip(os.linesep)
 
             files[filename] = os.stat(filename).st_mtime
-            if self.arguments['limit'] == result_count:
-                break
 
         return files
 
     @staticmethod
-    def create_json(sorted_list):
+    def create_json(sorted_list, limit):
         '''Prepare and return JSON output'''
         files = []
+        result_count = 0
+
         for list_item in sorted_list:
+
+            # Check at start of loop, since limit can be 0
+            if result_count == limit:
+                break
+
+            result_count += 1
+
             filename = list_item[0]
             record = {
                 'type': "file",
@@ -166,10 +171,18 @@ class FindRecentFiles:
         print(json.dumps(items))
 
     @staticmethod
-    def create_text(sorted_list):
+    def create_text(sorted_list, limit):
         '''Prepare and return plain text output'''
+        result_count = 0
+
         for list_item in sorted_list:
+
+            # Check at start of loop, since limit can be 0
+            if result_count == limit:
+                break
+
             print(list_item[0])
+            result_count += 1
 
     def run(self):
         '''Main program'''
@@ -177,9 +190,9 @@ class FindRecentFiles:
         files = self.find_recent_files()
         sorted_list = sorted(files.items(), key=lambda x:x[1], reverse=True)
         if self.arguments['output_format'] == 'json':
-            self.create_json(sorted_list)
+            self.create_json(sorted_list, self.arguments['limit'])
         else:
-            self.create_text(sorted_list)
+            self.create_text(sorted_list, self.arguments['limit'])
 
 
 if __name__ == '__main__':
