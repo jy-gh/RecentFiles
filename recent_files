@@ -39,6 +39,10 @@ class FindRecentFiles:
             print("  " + self.arguments['fd_command'])
             sys.exit(1)
 
+        if self.arguments['limit'] < 1:
+            print("Error: -l/--limit must be greater than 1!")
+            sys.exit(1)
+
     def _parse_arguments(self):
         '''Parses command line arguments'''
         parser = argparse.ArgumentParser(description='Finds recent files')
@@ -77,7 +81,7 @@ class FindRecentFiles:
             type=int,
             default=-1,
             required=False,
-            help='Limit number of results')
+            help='Limit number of results; must be greater than 1')
         parser.add_argument(
             '-o', '--output-format',
             dest='output_format',
@@ -147,7 +151,6 @@ class FindRecentFiles:
 
         for list_item in sorted_list:
 
-            # Check at start of loop, since limit can be 0
             if result_count == limit:
                 break
 
