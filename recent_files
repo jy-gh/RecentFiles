@@ -71,6 +71,13 @@ class FindRecentFiles:
             help="Directory to start search from, the default is the current directory",
         )
         parser.add_argument(
+            "--fd-command",
+            dest="fd_command",
+            type=str,
+            required=False,
+            help="Path to the fd(1) command; the default is " + FD_COMMAND,
+        )
+        parser.add_argument(
             "-H",
             "--hidden",
             dest="show_hidden",
@@ -86,13 +93,6 @@ class FindRecentFiles:
             type=str,
             required=False,
             help="Path to the Git-format ignore file for search exclusions, optional",
-        )
-        parser.add_argument(
-            "--fd-command",
-            dest="fd_command",
-            type=str,
-            required=False,
-            help="Path to the fd(1) command; the default is " + FD_COMMAND,
         )
         parser.add_argument(
             "-l",
