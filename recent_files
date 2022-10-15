@@ -14,6 +14,7 @@ import sys
 
 FD_COMMAND = "/opt/local/bin/fd"
 FD_DEFAULT_FILETYPE = "f"
+FD_ALLOWED_FILETYPES = ("f", "d", "l", "s", "p", "x", "e")
 
 
 class FindRecentFiles:
@@ -23,13 +24,21 @@ class FindRecentFiles:
         """Initialize variables"""
 
         self._parse_arguments()
+        self.filetypes = set()
 
         if self.arguments["dir"] is None:
             self.arguments["dir"] = os.getcwd()
 
-        if self.arguments["filetypes"] is None:
-            self.arguments["filetypes"] = []
-            self.arguments["filetypes"].append(FD_DEFAULT_FILETYPE)
+        if self.arguments["_filetypes"] is None:
+            self.filetypes.add(FD_DEFAULT_FILETYPE)
+        else:
+            for item in self.arguments["_filetypes"]:
+                for char in item:
+                    if char in FD_ALLOWED_FILETYPES:
+                        self.filetypes.add(char)
+                    else:
+                        print("Error: invalid filetype: '" + char + "'!")
+                        sys.exit(1)
 
         if self.arguments["fd_command"] is None:
             self.arguments["fd_command"] = FD_COMMAND
@@ -114,11 +123,14 @@ class FindRecentFiles:
         parser.add_argument(
             "-t",
             "--filetype",
-            dest="filetypes",
-            choices=["f", "d", "l", "s", "p", "x", "e"],
+            dest="_filetypes",
             required=False,
             action="append",
-            help='Filetype, as supported by fd(1), default is "f"',
+            help="Filetype, as supported by fd(1), default is \"f\";\
+            the argument may be repeated or combined, so both (1) and (2)\
+            are allowed:\
+              (1) --filetype fd\
+              (2) --filetype f --filetype d",
         )
 
         parsed_arguments = parser.parse_args()
@@ -133,7 +145,7 @@ class FindRecentFiles:
         options.append("--changed-within")
         options.append(self.arguments["changed_within"])
 
-        for filetype in self.arguments["filetypes"]:
+        for filetype in self.filetypes:
             options.append("-t")
             options.append(filetype)
 
