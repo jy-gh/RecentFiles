@@ -43,13 +43,14 @@ class FindRecentFiles:
             print("Error: -l/--limit must be greater than 1!")
             sys.exit(1)
 
-        if os.path.isfile(self.arguments["ignore_file"]):
-            ignore_file = os.path.abspath(self.arguments["ignore_file"])
-            self.arguments["ignore_file_absolute_path"] = ignore_file
-        else:
-            print("Error: -i/--ignore-file file does not exist!")
-            print("  " + self.arguments["ignore_file"])
-            sys.exit(1)
+        if self.arguments["ignore_file"] is not None:
+            if os.path.isfile(self.arguments["ignore_file"]):
+                ignore_file = os.path.abspath(self.arguments["ignore_file"])
+                self.arguments["ignore_file_absolute_path"] = ignore_file
+            else:
+                print("Error: -i/--ignore-file file does not exist!")
+                print("  " + self.arguments["ignore_file"])
+                sys.exit(1)
 
     def _parse_arguments(self):
         """Parses command line arguments"""
@@ -82,7 +83,6 @@ class FindRecentFiles:
             "-i",
             "--ignore-file",
             dest="ignore_file",
-            default=None,
             type=str,
             required=False,
             help="Path to the Git-format ignore file for search exclusions, optional",
