@@ -8,7 +8,7 @@ Output may be text or JSON. JSON output was intended for use by an [Alfred](http
 
 ## Prerequisites
 
-Both Python 3 and *fd(1)* are required to run this application. Both can be installed from a variety of sources, including Brew, MacPorts, and direct downloads of the executables for your platform.
+Both Python 3 and *fd(1)* are required to run this application. Both can be installed from a variety of sources, including [Brew](https://brew.sh/), [MacPorts](https://www.macports.org/), and direct downloads of the executables for your platform.
 
 The default location specified in the script for fd(1) is `/opt/local/bin/fd`. This can be overridden with the command line argument `--fd-command`. See below.
 
