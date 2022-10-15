@@ -164,7 +164,13 @@ class FindRecentFiles:
             # that the line.rstrip() call uses os.linesep, not a hardcoded '\n'
             filename = line.rstrip(os.linesep)
 
-            files[filename] = os.stat(filename).st_mtime
+            # It makes more sense to simply ignore FileNotFoundError than it
+            # does to crash the application.
+            try:
+                mtime = os.stat(filename).st_mtime
+                files[filename] = mtime
+            except FileNotFoundError:
+                continue
 
         return files
 
