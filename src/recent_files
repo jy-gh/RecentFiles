@@ -105,7 +105,7 @@ class FindRecentFiles:
             type=int,
             default=-1,
             required=False,
-            help="Limit number of results; must be greater than 1",
+            help="Limit number of results to LIMIT; -1 returns all results",
         )
         parser.add_argument(
             "-o",
