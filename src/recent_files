@@ -1,0 +1,242 @@
+#! /usr/bin/env python3
+
+"""
+Shows recently modified files in either JSON or text format.
+The JSON format is used for an Alfred workflow.
+"""
+
+import argparse
+import io
+import json
+import os
+import subprocess
+import sys
+
+FD_COMMAND = "/opt/local/bin/fd"
+FD_DEFAULT_FILETYPE = "f"
+FD_ALLOWED_FILETYPES = ("f", "d", "l", "s", "p", "x", "e")
+
+
+class FindRecentFiles:
+    """Uses the fd command to find recent files"""
+
+    def __init__(self):
+        """Initialize variables"""
+
+        self._parse_arguments()
+        self.filetypes = set()
+
+        if self.arguments["dir"] is None:
+            self.arguments["dir"] = os.getcwd()
+
+        if self.arguments["_filetypes"] is None:
+            self.filetypes.add(FD_DEFAULT_FILETYPE)
+        else:
+            for item in self.arguments["_filetypes"]:
+                for char in item:
+                    if char in FD_ALLOWED_FILETYPES:
+                        self.filetypes.add(char)
+                    else:
+                        print("Error: invalid filetype: '" + char + "'!")
+                        sys.exit(1)
+
+        if self.arguments["fd_command"] is None:
+            self.arguments["fd_command"] = FD_COMMAND
+
+        if not os.access(self.arguments["fd_command"], os.X_OK):
+            print("Error: the configured fd command is not executable!")
+            print("  " + self.arguments["fd_command"])
+            sys.exit(1)
+
+        if self.arguments["limit"] < 1:
+            print("Error: -l/--limit must be greater than 1!")
+            sys.exit(1)
+
+        if self.arguments["ignore_file"] is not None:
+            if os.path.isfile(self.arguments["ignore_file"]):
+                ignore_file = os.path.abspath(self.arguments["ignore_file"])
+                self.arguments["ignore_file_absolute_path"] = ignore_file
+            else:
+                print("Error: -i/--ignore-file file does not exist!")
+                print("  " + self.arguments["ignore_file"])
+                sys.exit(1)
+
+    def _parse_arguments(self):
+        """Parses command line arguments"""
+        parser = argparse.ArgumentParser(description="Finds recent files")
+        parser.add_argument(
+            "-c",
+            "--changed-within",
+            dest="changed_within",
+            default="7d",
+            type=str,
+            required=False,
+            help="Changed within 1h, 2d, 5min, etc.; the default is 7d",
+        )
+        parser.add_argument(
+            "-d",
+            "--dir",
+            required=False,
+            help="Directory to start search from, the default is the current directory",
+        )
+        parser.add_argument(
+            "--fd-command",
+            dest="fd_command",
+            type=str,
+            required=False,
+            help="Path to the fd(1) command; the default is " + FD_COMMAND,
+        )
+        parser.add_argument(
+            "-H",
+            "--hidden",
+            dest="show_hidden",
+            default=False,
+            action="store_true",
+            required=False,
+            help="Show hidden files; the default is not to show hidden files",
+        )
+        parser.add_argument(
+            "-i",
+            "--ignore-file",
+            dest="ignore_file",
+            type=str,
+            required=False,
+            help="Path to the Git-format ignore file for search exclusions, optional",
+        )
+        parser.add_argument(
+            "-l",
+            "--limit",
+            type=int,
+            default=-1,
+            required=False,
+            help="Limit number of results; must be greater than 1",
+        )
+        parser.add_argument(
+            "-o",
+            "--output-format",
+            dest="output_format",
+            choices=["text", "json"],
+            required=False,
+            default="text",
+            help="Output format, default is text",
+        )
+        parser.add_argument(
+            "-t",
+            "--filetype",
+            dest="_filetypes",
+            required=False,
+            action="append",
+            help="Filetype, as supported by fd(1), default is \"f\";\
+            the argument may be repeated or combined, so both (1) and (2)\
+            are allowed:\
+              (1) --filetype fd\
+              (2) --filetype f --filetype d",
+        )
+
+        parsed_arguments = parser.parse_args()
+        self.arguments = vars(parsed_arguments)
+
+    def _set_options(self):
+        """Set up the command line options for the fd command"""
+        options = []
+
+        options.append("-a")
+
+        options.append("--changed-within")
+        options.append(self.arguments["changed_within"])
+
+        for filetype in self.filetypes:
+            options.append("-t")
+            options.append(filetype)
+
+        if "ignore_file_absolute_path" in self.arguments:
+            options.append("--ignore-file")
+            options.append(self.arguments["ignore_file_absolute_path"])
+
+        if "show_hidden" in self.arguments and self.arguments["show_hidden"]:
+            options.append("-H")
+
+        return options
+
+    def find_recent_files(self):
+        """Run the fd command, parse the result, and get file mtime values"""
+        files = {}
+        options = self._set_options()
+
+        result = subprocess.Popen(
+            [self.arguments["fd_command"], *options],
+            stdout=subprocess.PIPE,
+            cwd=self.arguments["dir"],
+        )
+
+        for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
+
+            # Universal newlines are on, and io.TextIOWrapper will translate
+            # end of line characters to '\n'; however, it seems wise to ensure
+            # that the line.rstrip() call uses os.linesep, not a hardcoded '\n'
+            filename = line.rstrip(os.linesep)
+
+            # It makes more sense to simply ignore FileNotFoundError than it
+            # does to crash the application.
+            try:
+                mtime = os.stat(filename).st_mtime
+                files[filename] = mtime
+            except FileNotFoundError:
+                continue
+
+        return files
+
+    @staticmethod
+    def create_json(sorted_list, limit):
+        """Prepare and return JSON output"""
+        files = []
+        result_count = 0
+
+        for list_item in sorted_list:
+
+            if result_count == limit:
+                break
+
+            result_count += 1
+
+            filename = list_item[0]
+            record = {
+                "type": "file",
+                "title": filename,
+                "subtitle": filename,
+                "arg": filename,
+                "icon": {"type": "fileicon", "path": filename},
+            }
+            files.append(record)
+
+        items = {"items": files}
+
+        print(json.dumps(items))
+
+    @staticmethod
+    def create_text(sorted_list, limit):
+        """Prepare and return plain text output"""
+        result_count = 0
+
+        for list_item in sorted_list:
+
+            if result_count == limit:
+                break
+
+            print(list_item[0])
+            result_count += 1
+
+    def run(self):
+        """Main program"""
+
+        files = self.find_recent_files()
+        sorted_list = sorted(files.items(), key=lambda x: x[1], reverse=True)
+        if self.arguments["output_format"] == "json":
+            self.create_json(sorted_list, self.arguments["limit"])
+        else:
+            self.create_text(sorted_list, self.arguments["limit"])
+
+
+if __name__ == "__main__":
+    program = FindRecentFiles()
+    program.run()
