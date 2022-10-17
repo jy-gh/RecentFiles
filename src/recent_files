@@ -117,6 +117,14 @@ class FindRecentFiles:
             help="Output format, default is text",
         )
         parser.add_argument(
+            "--reverse",
+            dest="reverse_sort",
+            default=True,
+            action="store_false",
+            required=False,
+            help="Reverse the sorting order; default is newest files first",
+        )
+        parser.add_argument(
             "-t",
             "--filetype",
             dest="_filetypes",
@@ -226,7 +234,9 @@ class FindRecentFiles:
         """Main program"""
 
         files = self.find_recent_files()
-        sorted_list = sorted(files.items(), key=lambda x: x[1], reverse=True)
+        sorted_list = sorted(files.items(),
+                             key=lambda x: x[1],
+                             reverse=self.arguments["reverse_sort"])
         if self.arguments["output_format"] == "json":
             self.create_json(sorted_list, self.arguments["limit"])
         else:
