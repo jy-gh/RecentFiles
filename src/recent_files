@@ -48,10 +48,6 @@ class FindRecentFiles:
             print("  " + self.arguments["fd_command"])
             sys.exit(1)
 
-        if self.arguments["limit"] < 1:
-            print("Error: -l/--limit must be greater than 1!")
-            sys.exit(1)
-
         if self.arguments["ignore_file"] is not None:
             if os.path.isfile(self.arguments["ignore_file"]):
                 ignore_file = os.path.abspath(self.arguments["ignore_file"])
