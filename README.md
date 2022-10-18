@@ -1,26 +1,60 @@
-# recent_files
+# Recent Files
 
 ## Overview
 
-*recent_files* displays a list of recently-modified files. By default, files modified in the past seven days are shown. By default, it uses Git ignore files to restrict the files shown.
+Recent Files is both an [Alfred](https://www.alfredapp.com) workflow and a standalone command-line utility that displays a list of recently added/modified files, most recent first. When used as an Alfred workflow, the list of files is displayed in Alfred's file browser. When used as a command-line utility, the list of files is sent to the standard output.
 
-Output may be text or JSON. JSON output was intended for use by an [Alfred](https://www.alfredapp.com/) workflow.
+### Prerequisites
 
-## Prerequisites
+You must have [Alfred's Powerpack](https://www.alfredapp.com/powerpack/) installed in order to use Report Files as an Alfred workflow.
 
-Both Python 3 and *fd(1)* are required to run this application. Both can be installed from a variety of sources, including [Brew](https://brew.sh/), [MacPorts](https://www.macports.org/), and direct downloads of the executables for your platform.
+In addition, the `fd` command is required to run this application. `fd` can be installed from a variety of sources, including [MacPorts](https://www.macports.org/) and [Brew](https://brew.sh/).
 
-The default location specified in the script for fd(1) is `/opt/local/bin/fd`. This can be overridden with the command line argument `--fd-command`. See below.
+It's possible to confirm that `fd` is installed by entering the following command in a Terminal window:
 
-## Installation
+`which fd`
 
-Copy *recent_files* to a directory in your $PATH, such as `~/bin` or wherever user scripts are located.
+If the message "fd not found" is displayed, that means that the `fd` command has not been installed. If `fd` is installed, the command will display the correct path to it. Use this path in the Workflow Configuration (or with the --fd-command argument to *recent_files*) if it differs from the default location, `/opt/local/bin/fd`.
 
-## Command-line usage
+## Recent Files, the Alfred workflow
+
+### Installation
+
+Download the workflow and double-click on it to install it.
+
+### Usage
+
+`rf` — Invoke Recent Files
+
+After invocation, Recent Files will display the list of results in Alfred where any allowed action (open/move/delete/preview, etc.) may be performed. By default, this search starts at the user's `$HOME` directory—although this can be changed, see the Configuration section—and includes files in subdirectories.
+
+### Workflow Configuration
+
+The behavior of Recent Files may be configured by selecting the workflow and clicking on the `Configure Workflow` button in Alfred. Here are the values that can changed from that screen:
+
+|Variable|Default value|Description|
+|---------|--------|--------|
+|`keyword`|rf| Keyword to invoke Recent Files from Alfred.|
+|`FD_COMMAND`|`/opt/local/bin/fd`| Path to the `fd` command; Brew users may need to change this to `/usr/local/bin/fd`.|
+|`TOP_LEVEL_DIRECTORY`|`$HOME`| Directory to search; custom values must have an absolute path. Don't use `$HOME` or `~` in the configuration screen, as those values will not work.|
+|`MAX_RESULTS`|20|Maximum number of results to display in Alfred.|
+|`IGNORE_FILE`|`example_ignore_file.txt`|File to use as an ignore file; see [Ignore Files](#Ignore-Files).|
+|`CHANGED_WITHIN`|7d|Show items added/changed within a time period; other units may be used, such as min (minutes), h (hours), and w (weeks). A value of 12h, for example, would only return files created or modified the previous 12 hours.|
+|`FILETYPE`|f|File types to display; valid types include f for files, d for directories. These arguments can be combined, so df will show both directories and files.|
+
+## recent_files, the command-line utility
+
+The Recent Files Alfred workflow uses a Python 3 script, *recent_files*, to perform the search. *recent_files* can be used as a standalone command-line utility to display a list of recently-modified files to standard output (stdout).
+
+### Installation
+
+To use *recent_files* as a standalone utility, copy it to a directory in your `$PATH`, such as `~/bin` or wherever user scripts are located.
+
+### Command-line usage
 
 ```
-usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIR] [-H] [-i IGNORE_FILE]
-                    [--fd-command FD_COMMAND] [-l LIMIT] [-o {text,json}] [-t {f,d,l,s,p,x,e}]
+usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIR] [--fd-command FD_COMMAND] [-H]
+                    [-i IGNORE_FILE] [-l LIMIT] [-o {text,json}] [--reverse] [-t FILETYPES]
 
 Finds recent files
 
@@ -29,24 +63,31 @@ optional arguments:
   -c CHANGED_WITHIN, --changed-within CHANGED_WITHIN
                         Changed within 1h, 2d, 5min, etc.; the default is 7d
   -d DIR, --dir DIR     Directory to start search from, the default is the current directory
+  --fd-command FD_COMMAND
+                        Path to the fd(1) command; the default is /opt/local/bin/fd
   -H, --hidden          Show hidden files; the default is not to show hidden files
   -i IGNORE_FILE, --ignore-file IGNORE_FILE
                         Path to the Git-format ignore file for search exclusions, optional
-  --fd-command FD_COMMAND
-                        Path to the fd(1) command; the default is /opt/local/bin/fd
   -l LIMIT, --limit LIMIT
-                        Limit number of results; must be greater than 1
+                        Limit number of results to LIMIT; the default is to return all results
   -o {text,json}, --output-format {text,json}
-                        Output format, default is text
-  -t {f,d,l,s,p,x,e}, --filetype {f,d,l,s,p,x,e}
-                        Filetype, as supported by fd(1), default is "f"
+                        Output format, default is text; json is for use by Alfred
+  --reverse             Reverse the sorting order; default is newest files first
+  -t FILETYPES, --filetype FILETYPES
+                        Filetype, as supported by fd; the default is "f"; the argument may be
+                        repeated or combined, so both (1) and (2) are allowed: (1) --filetype
+                        fd (2) --filetype f --filetype d
 ```
 
 ### Command-line examples
 
-List files modified within the past day:
+List all files modified within the past day:
 
-`recent_files --changed_within 1d`
+`recent_files --changed-within 1d`
+
+List files and directories modified within the past three days:
+
+`recent_files --changed-within 3d --filetype fd`
 
 List files modified in the past week, in the Documents folder:
 
@@ -56,17 +97,17 @@ List files modified in the past hour, including hidden files:
 
 `recent_files -c 1h -H`
 
-Use a custom ignore file, return JSON output:
+Use a custom ignore file, display results in reverse order (oldest item first):
 
-`recent_files --ignore-file ~/my_ignore_file -o json`
+`recent_files --ignore-file ~/my_ignore_file --reverse`
 
-Specify a different location for the fd(1) command:
+Specify a different location for the fd command:
 
 `recent_files --fd-command /some/path/to/fd/command`
 
-## Ignore Files using a Git-style ignore file
+## Ignore Files
 
-*recent_files*, through *fd(1)*, will respect a Git-style ignore file.
+Both the Recent Files workflow and the *recent_files* command-line utility will use a Git-style ignore file.
 
 Here's an example ignore file:
 
@@ -77,25 +118,17 @@ Library
 *.mov
 ```
 
-This ignore file will cause *fd(1)* to ignore files in the Library folder, files beginning with the '~' character (often used for temporary files), .jpg image files, and .mov movie files. Files matched in an ignore file will not be returned as results.
+This ignore file will cause `fd` to ignore files in the Library folder, files beginning with the '~' character (often used for temporary files), .jpg image files, and .mov movie files. Files matched in an ignore file will not be returned as results.
 
 If this file was named `my_ignore_file` and put in the $HOME directory, the following command line would allow *recent_files* to use it:
 
 `recent_files --ignore-file $HOME/my_ignore_file`
 
-## Alfred usage
+Note that an empty, 0-length file is a valid ignore file. While this may not be useful for the *recent_files* command-line (since one could simply omit the `-i/--ignore-file` argument) this might be desirable when using the workflow.
 
-Although *recent_files* can be used from the command-line, it was initially intended to be used with the [Alfred application launcher](https://www.alfredapp.com).
+## JSON output for Alfred
 
-### Example usage within Alfred
-
-A minimal command line for an Alfred workflow would look like this:
-
-`/Users/j/bin/recent_files --dir $HOME --output-format json`
-
-### JSON output
-
-*recent_files* uses the JSON output format defined by Alfred.
+*recent_files* produces JSON output format as specified by Alfred. It's unlikely to be useful when using the command-line interface, but this capability is necessary for the Recent Files workflow to function correctly.
 
 See [Script Filter JSON Format](https://www.alfredapp.com/help/workflows/inputs/script-filter/json/) for more, but here's the basic structure:
 
@@ -128,12 +161,44 @@ See [Script Filter JSON Format](https://www.alfredapp.com/help/workflows/inputs/
 
 Note that *recent_files* does not populate the **uid** and **autocomplete** properties used by Alfred.
 
-### Tips on changing search results and speeding up the search
+## Tips on changing search results and speeding up the search
 
-If *recent_files* isn't finding what you need, or alternately if *recent_files* is slow, consider some of the following options:
+If Recent Files/*recent_files* isn't finding what you need, consider some of the following options:
 
-1. Add a `--changed-within` argument to the command line to increase or decrease the default time period to search. An increase in the time period from the default of 7 days will increase the number of results, while a decrease in the time period will increase performance.
+### Change the default changed within time period
 
-2. Add a `--ignore-file` argument to the command. This may drastically increase performance. See *Ignore Files using a Git-style ignore file*.
+An increase in the time period from the default of 7 days will increase the number of results returned, while a decrease in the time period will increase performance and reduce the number of results returned.
 
-3. Add a `--limit n` argument. While this won't increase the performance of the search itself, it will reduce the number of files displayed, which may
+See the [Workflow Configuration](#Workflow-Configuration) section for information on changing this value in the Recent Files workflow.
+
+For the *recent_files* command-line utility, do the following:
+
+Add a `--changed-within` argument to the command line to increase or decrease the default time period to search.
+
+### Add a custom ignore file
+
+A custom ignore file is one of the best ways to filter out unwanted results.
+
+See the [Workflow Configuration](#Workflow-Configuration) section for information on changing this value in the Recent Files workflow.
+
+For the *recent_files* command-line utility, do the following:
+
+Add the `--ignore-file` argument to the command. See [Ignore Files](#Ignore-Files).
+
+### Limit the number of returned results
+
+See the [Workflow Configuration](#Workflow-Configuration) section for information on changing this value in the Recent Files workflow.
+
+For the *recent_files* command-line utility, do the following:
+
+Add the `--limit` argument. While this won't increase the performance of the search itself, it will reduce the number of files displayed, which may prevent the list of files from being overly large.
+
+### Change the top-level directory
+
+Changing the default top-level directory from `$HOME` to another directory, such as `$HOME/Documents` is another way to return results faster, as it will eliminate many files from consideration.
+
+See the [Workflow Configuration](#Workflow-Configuration) section for information on changing this value in the Recent Files workflow, keeping in mind that pathnames must be absolute.
+
+For the *recent_files* command-line utility, do the following:
+
+Add the `--directory` argument to the command.
