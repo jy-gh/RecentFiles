@@ -105,7 +105,7 @@ class FindRecentFiles:
             type=int,
             default=-1,
             required=False,
-            help="Limit number of results to LIMIT; -1 returns all results",
+            help="Limit number of results to LIMIT; the default is to return all results",
         )
         parser.add_argument(
             "-o",
@@ -114,7 +114,7 @@ class FindRecentFiles:
             choices=["text", "json"],
             required=False,
             default="text",
-            help="Output format, default is text",
+            help="Output format, default is text; json is for use by Alfred",
         )
         parser.add_argument(
             "--reverse",
