@@ -4,9 +4,13 @@
 
 Recent Files is both an [Alfred](https://www.alfredapp.com) workflow and a standalone command-line utility that displays a list of recently added/modified files, most recent first. When used as an Alfred workflow, the list of files is displayed in Alfred's file browser. When used as a command-line utility, the list of files is sent to the standard output.
 
-### Prerequisites
+## Prerequisites
+
+### Alfred Powerpack
 
 You must have [Alfred's Powerpack](https://www.alfredapp.com/powerpack/) installed in order to use Report Files as an Alfred workflow.
+
+### fd
 
 In addition, the `fd` command is required to run this application. `fd` can be installed from a variety of sources, including [MacPorts](https://www.macports.org/) and [Brew](https://brew.sh/).
 
@@ -14,7 +18,23 @@ It's possible to confirm that `fd` is installed by entering the following comman
 
 `which fd`
 
-If the message "fd not found" is displayed, that means that the `fd` command has not been installed. If `fd` is installed, the command will display the correct path to it. Use this path in the Workflow Configuration (or with the --fd-command argument to *recent_files*) if it differs from the default location, `/opt/local/bin/fd`.
+If the message **fd not found** is displayed, that means that the `fd` command has not been installed. If `fd` is installed, the command will display the correct path to it. Use this path in the Workflow Configuration (or with the --fd-command argument to *recent_files*) if it differs from the default location, `/opt/local/bin/fd`.
+
+### Python 3
+
+Recent Files and *recent_files* require Python 3.x (probably 3.8.2 or higher, but other 3.x versions may work).
+
+It's possible to confirm that `python3` is installed by entering the following commands in a Terminal window:
+
+`which python3`
+
+If the message **python3 not found** is displayed it will be necessary to install Python in order to use Recent Files/*recent_files*.
+
+Python 3.x may be installed using any of the following:
+
+* [MacPorts](https://www.macports.org/)
+* [Brew](https://brew.sh/)
+* [Direct download from Python.org](https://www.python.org/downloads/)
 
 ## Recent Files, the Alfred workflow
 
@@ -42,7 +62,7 @@ The behavior of Recent Files may be configured by selecting the workflow and cli
 |`CHANGED_WITHIN`|7d|Show items added/changed within a time period; other units may be used, such as min (minutes), h (hours), and w (weeks). A value of 12h, for example, would only return files created or modified the previous 12 hours.|
 |`FILETYPE`|f|File types to display; valid types include f for files, d for directories. These arguments can be combined, so df will show both directories and files.|
 
-## recent_files, the command-line utility
+## *recent_files*, the command-line utility
 
 The Recent Files Alfred workflow uses a Python 3 script, *recent_files*, to perform the search. *recent_files* can be used as a standalone command-line utility to display a list of recently-modified files to standard output (stdout).
 
@@ -109,18 +129,22 @@ Specify a different location for the fd command:
 
 Both the Recent Files workflow and the *recent_files* command-line utility will use a Git-style ignore file.
 
-Here's an example ignore file:
+Here's the provided ignore file:
 
 ```
 Library
+Icon?
 ~*
-*.jpg
-*.mov
+*.history
+*.indexes
+*.photoslibrary
+*.musiclibrary
+*.tvlibrary
 ```
 
-This ignore file will cause `fd` to ignore files in the Library folder, files beginning with the '~' character (often used for temporary files), .jpg image files, and .mov movie files. Files matched in an ignore file will not be returned as results.
+This ignore file will cause `fd` to ignore files in the Library folder, the Icon files with embedded carriage returns, files beginning with the '~' character (often used for temporary files), .photoslibrary, .musiclibrary, and .tvlibrary files. Files matched in an ignore file will not be returned as results.
 
-If this file was named `my_ignore_file` and put in the $HOME directory, the following command line would allow *recent_files* to use it:
+If this file was named `my_ignore_file` and put in the `$HOME` directory, the following command line would allow *recent_files* to use it:
 
 `recent_files --ignore-file $HOME/my_ignore_file`
 
@@ -202,3 +226,11 @@ See the [Workflow Configuration](#Workflow-Configuration) section for informatio
 For the *recent_files* command-line utility, do the following:
 
 Add the `--directory` argument to the command.
+
+## Acknowledgements
+
+This workflow was inspired by Hans Raaf's Alfred workflow, [*Last changed files*](https://github.com/oderwat/alfredworkflows).
+
+## Copyright
+
+All code/media is released under the [MIT License](https://opensource.org/licenses/MIT)
