@@ -29,10 +29,10 @@ class FindRecentFiles:
         if self.arguments["dir"] is None:
             self.arguments["dir"] = os.getcwd()
 
-        if self.arguments["_filetypes"] is None:
+        if self.arguments["filetypes"] is None:
             self.filetypes.add(FD_DEFAULT_FILETYPE)
         else:
-            for item in self.arguments["_filetypes"]:
+            for item in self.arguments["filetypes"]:
                 for char in item:
                     if char in FD_ALLOWED_FILETYPES:
                         self.filetypes.add(char)
@@ -132,7 +132,7 @@ class FindRecentFiles:
         parser.add_argument(
             "-t",
             "--filetype",
-            dest="_filetypes",
+            dest="filetypes",
             required=False,
             action="append",
             help="Filetype, as supported by fd; the default is \"f\";\
