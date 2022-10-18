@@ -43,6 +43,11 @@ class FindRecentFiles:
         if self.arguments["fd_command"] is None:
             self.arguments["fd_command"] = FD_COMMAND
 
+        if not os.path.isfile(self.arguments["fd_command"]):
+            print("Error: the configured fd command does not exist!")
+            print("  " + self.arguments["fd_command"])
+            sys.exit(1)
+
         if not os.access(self.arguments["fd_command"], os.X_OK):
             print("Error: the configured fd command is not executable!")
             print("  " + self.arguments["fd_command"])
