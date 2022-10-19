@@ -72,20 +72,20 @@ class FindRecentFiles:
             default="7d",
             type=str,
             required=False,
-            help="Changed within 1h, 2d, 5min, etc.; the default is 7d",
+            help="changed within 1h, 2d, 5min, etc.; the default is 7d",
         )
         parser.add_argument(
             "-d",
             "--dir",
             required=False,
-            help="Directory to start search from; the default is the current directory",
+            help="directory to start search from; the default is the current directory",
         )
         parser.add_argument(
             "--fd-command",
             dest="fd_command",
             type=str,
             required=False,
-            help="Path to the fd(1) command; the default is " + FD_COMMAND,
+            help="path to the fd(1) command; the default is " + FD_COMMAND,
         )
         parser.add_argument(
             "-H",
@@ -94,7 +94,7 @@ class FindRecentFiles:
             default=False,
             action="store_true",
             required=False,
-            help="Show hidden files; the default is not to show hidden files",
+            help="show hidden files; the default is not to show hidden files",
         )
         parser.add_argument(
             "-i",
@@ -102,7 +102,7 @@ class FindRecentFiles:
             dest="ignore_file",
             type=str,
             required=False,
-            help="Path to the Git-format ignore file for search exclusions, optional",
+            help="path to the Git-format ignore file for search exclusions, optional",
         )
         parser.add_argument(
             "-l",
@@ -119,7 +119,7 @@ class FindRecentFiles:
             choices=["text", "json"],
             required=False,
             default="text",
-            help="Output format, default is text; json is for use by Alfred",
+            help="output format, default is text; json is for use by Alfred",
         )
         parser.add_argument(
             "--reverse",
@@ -127,7 +127,7 @@ class FindRecentFiles:
             default=True,
             action="store_false",
             required=False,
-            help="Reverse the sorting order; the default is newest files first",
+            help="reverse the sorting order; the default is newest files first",
         )
         parser.add_argument(
             "-t",
@@ -135,7 +135,7 @@ class FindRecentFiles:
             dest="filetypes",
             required=False,
             action="append",
-            help="Filetype, as supported by fd; the default is \"f\";\
+            help="filetype, as supported by fd; the default is \"f\";\
             the argument may be repeated or combined, so both (1) and (2)\
             are allowed:\
               (1) --filetype fd\
