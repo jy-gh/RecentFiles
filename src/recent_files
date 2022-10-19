@@ -78,7 +78,7 @@ class FindRecentFiles:
             "-d",
             "--dir",
             required=False,
-            help="Directory to start search from, the default is the current directory",
+            help="Directory to start search from; the default is the current directory",
         )
         parser.add_argument(
             "--fd-command",
@@ -127,7 +127,7 @@ class FindRecentFiles:
             default=True,
             action="store_false",
             required=False,
-            help="Reverse the sorting order; default is newest files first",
+            help="Reverse the sorting order; the default is newest files first",
         )
         parser.add_argument(
             "-t",
