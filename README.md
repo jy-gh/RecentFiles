@@ -8,7 +8,7 @@ The Python script **recent_files**, which does the work behind the workflow, may
 
 ***NOTE***: **Recent Files** was developed on and for macOS. It has not been tested on any other operating system, and the following documentation is written from the perspective of a macOS user.
 
-![demo][recent_files_alfred_demo]
+![Demo](recent_files_alfred_demo.gif)
 
 ## Prerequisites
 
