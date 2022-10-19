@@ -60,11 +60,11 @@ The behavior of **Recent Files** may be configured by selecting the workflow and
 
 |Variable|Default value|Description|
 |---------|--------|--------|
-|`keyword`|rf| Keyword to invoke **Recent Files** from Alfred.|
-|`FD_COMMAND`|`/opt/local/bin/fd`| Path to the `fd` command; Brew users may need to change this to `/usr/local/bin/fd`.|
-|`TOP_LEVEL_DIRECTORY`|| Directory to search other than `$HOME` (an empty value causes the workflow to default to `$HOME`). Custom values must have an absolute path. Don't use `$HOME` or `~` in the configuration screen, as those values will not work.|
-|`MAX_RESULTS`|20|Maximum number of results to display in Alfred.|
+|`keyword`|rf|Keyword to invoke **Recent Files** from Alfred.|
+|`FD_COMMAND`|`/opt/local/bin/fd`|Path to the `fd` command; Brew users may need to change this to `/usr/local/bin/fd`.|
+|`TOP_LEVEL_DIRECTORY`|~|Top level directory to search from. The ~ (tilde) specifies the user's `$HOME` directory.|
 |`IGNORE_FILE`|`example_ignore_file.txt`|File to use as an ignore file; see [Ignore Files](#Ignore-Files).|
+|`MAX_RESULTS`|20|Maximum number of results to display in Alfred.|
 |`CHANGED_WITHIN`|7d|Show items added/changed within a time period. The default is `7d` (seven days); other units may be used, such as min (minutes), h (hours), and w (weeks). A value of `12h`, for example, would only return files created or modified the previous 12 hours.|
 |`FILETYPE`|f|File types to display; valid types include f for files, d for directories. These arguments can be combined, so a FILETYPE value of `df` will show both directories and files.|
 
@@ -228,7 +228,7 @@ Add the `--max-results` argument. While this won't increase the performance of t
 
 Changing the default top-level directory from `$HOME` to another directory—such as `$HOME/Documents`—is another way to return results faster, as it will eliminate many files from consideration.
 
-See the [Workflow Configuration](#Workflow-Configuration) section for information on changing the `TOP_LEVEL_DIRECTORY` value in the **Recent Files** workflow, keeping in mind that the path to the directory must be absolute.
+See the [Workflow Configuration](#Workflow-Configuration) section for information on changing the `TOP_LEVEL_DIRECTORY` value in the **Recent Files** workflow.
 
 For the **recent_files** command-line utility, do the following:
 
