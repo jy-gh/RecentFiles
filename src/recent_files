@@ -105,12 +105,13 @@ class FindRecentFiles:
             help="path to the Git-format ignore file for search exclusions, optional",
         )
         parser.add_argument(
-            "-l",
-            "--limit",
+            "-m",
+            "--max-results",
+            dest="max_results",
             type=int,
             default=-1,
             required=False,
-            help="Limit number of results to LIMIT; the default is to return all results",
+            help="only return MAX_RESULTS items; the default is to return all results",
         )
         parser.add_argument(
             "-o",
@@ -196,14 +197,14 @@ class FindRecentFiles:
         return files
 
     @staticmethod
-    def create_json(sorted_list, limit):
+    def create_json(sorted_list, max_results):
         """Prepare and return JSON output"""
         files = []
         result_count = 0
 
         for list_item in sorted_list:
 
-            if result_count == limit:
+            if result_count == max_results:
                 break
 
             result_count += 1
@@ -223,13 +224,13 @@ class FindRecentFiles:
         print(json.dumps(items))
 
     @staticmethod
-    def create_text(sorted_list, limit):
+    def create_text(sorted_list, max_results):
         """Prepare and return plain text output"""
         result_count = 0
 
         for list_item in sorted_list:
 
-            if result_count == limit:
+            if result_count == max_results:
                 break
 
             print(list_item[0])
@@ -243,9 +244,9 @@ class FindRecentFiles:
                              key=lambda x: x[1],
                              reverse=self.arguments["reverse_sort"])
         if self.arguments["output_format"] == "json":
-            self.create_json(sorted_list, self.arguments["limit"])
+            self.create_json(sorted_list, self.arguments["max_results"])
         else:
-            self.create_text(sorted_list, self.arguments["limit"])
+            self.create_text(sorted_list, self.arguments["max_results"])
 
 
 if __name__ == "__main__":
