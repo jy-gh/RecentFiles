@@ -28,7 +28,7 @@ If the message *fd not found* is displayed, that means that the `fd` command has
 
 ### Python 3
 
-**Recent Files** and **recent_files** require Python 3.8; earlier 3.x version of Python may work, but have not been tested.
+**Recent Files** and **recent_files** require Python 3.8; earlier 3.x versions of Python may work, but have not been tested.
 
 It's possible to confirm that `python3` is installed by entering the following commands in a Terminal window:
 
