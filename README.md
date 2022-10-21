@@ -238,6 +238,8 @@ Add the `--directory` argument to the command.
 
 This workflow was inspired by Hans Raaf's Alfred workflow, [*Last changed files*](https://github.com/oderwat/alfredworkflows).
 
+Thanks to @vitorgalvao for suggesting the use of Alfred File Pickers.
+
 ## Copyright
 
 All code/media is released under the [MIT License](https://opensource.org/licenses/MIT)
