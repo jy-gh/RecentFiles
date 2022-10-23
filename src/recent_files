@@ -12,7 +12,7 @@ import os
 import subprocess
 import sys
 
-FD_COMMAND = "/opt/local/bin/fd"
+FD_COMMAND = "fd"
 FD_DEFAULT_FILETYPE = "f"
 FD_ALLOWED_FILETYPES = ("f", "d", "l", "s", "p", "x", "e")
 
@@ -42,16 +42,6 @@ class FindRecentFiles:
 
         if self.arguments["fd_command"] is None:
             self.arguments["fd_command"] = FD_COMMAND
-
-        if not os.path.isfile(self.arguments["fd_command"]):
-            print("Error: the configured fd command does not exist!")
-            print("  " + self.arguments["fd_command"])
-            sys.exit(1)
-
-        if not os.access(self.arguments["fd_command"], os.X_OK):
-            print("Error: the configured fd command is not executable!")
-            print("  " + self.arguments["fd_command"])
-            sys.exit(1)
 
         if self.arguments["ignore_file"] is not None:
             if os.path.isfile(self.arguments["ignore_file"]):
@@ -85,7 +75,7 @@ class FindRecentFiles:
             dest="fd_command",
             type=str,
             required=False,
-            help="path to the fd(1) command; the default is " + FD_COMMAND,
+            help="path to the fd(1) command if not specified in $PATH",
         )
         parser.add_argument(
             "-H",
@@ -173,11 +163,17 @@ class FindRecentFiles:
         files = {}
         options = self._set_options()
 
-        result = subprocess.Popen(
-            [self.arguments["fd_command"], *options],
-            stdout=subprocess.PIPE,
-            cwd=self.arguments["dir"],
-        )
+        try:
+            result = subprocess.Popen(
+                [self.arguments["fd_command"], *options],
+                stdout=subprocess.PIPE,
+                cwd=self.arguments["dir"],
+            )
+        except FileNotFoundError:
+            print("Error: the fd command does not exist or is not executable!")
+            print("  " + self.arguments["fd_command"])
+            sys.exit(1)
+
 
         for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
 
