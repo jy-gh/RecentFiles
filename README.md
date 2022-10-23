@@ -18,13 +18,9 @@ You must have [Alfred's Powerpack](https://www.alfredapp.com/powerpack/) install
 
 ### fd
 
-In addition, the `fd` command is required to run both the **Recent Files** workflow and the **recent_files** command-line utility. `fd` can be installed from a variety of sources, including [MacPorts](https://www.macports.org/) and [Brew](https://brew.sh/).
+In addition, the `fd` command is required to run both the **Recent Files** workflow and the **recent_files** command-line utility. Both the **Recent Files** workflow and the **recent_files** command-line utility will attempt to use the `fd` command that is present in your `$PATH`.
 
-It's possible to confirm that `fd` is installed by entering the following command in a Terminal window:
-
-`which fd`
-
-If the message *fd not found* is displayed, that means that the `fd` command has not been installed (or is not somewhere in the user's `$PATH`). If `fd` is installed, the command will display the correct path to it. Use this path in the Workflow Configuration (or with the `--fd-command` argument to **recent_files**) if it differs from the default location, `/opt/local/bin/fd`.
+In the event that `fd` is not installed on your system, it can be installed from a variety of sources, including [MacPorts](https://www.macports.org/), [Brew](https://brew.sh/), and [GitHub](https://github.com/sharkdp/fd).
 
 ### Python 3
 
@@ -61,7 +57,7 @@ The behavior of **Recent Files** may be configured by selecting the workflow and
 |Variable|Default value|Description|
 |---------|--------|--------|
 |`keyword`|rf|Keyword to invoke **Recent Files** from Alfred.|
-|`FD_COMMAND`|`/opt/local/bin/fd`|Path to the `fd` command; Brew users may need to change this to `/usr/local/bin/fd`.|
+|`FD_COMMAND`|fd|Path to the `fd` command. By default, the workflow will use the `fd` found in the `$PATH` variable.|
 |`TOP_LEVEL_DIRECTORY`|~|Top level directory to search from. The ~ (tilde) specifies the user's `$HOME` directory.|
 |`IGNORE_FILE`|`example_ignore_file.txt`|File to use as an ignore file; see [Ignore Files](#Ignore-Files).|
 |`MAX_RESULTS`|20|Maximum number of results to display in Alfred.|
@@ -93,7 +89,7 @@ optional arguments:
                         changed within 1h, 2d, 5min, etc.; the default is 7d
   -d DIR, --dir DIR     directory to start search from; the default is the current directory
   --fd-command FD_COMMAND
-                        path to the fd(1) command; the default is /opt/local/bin/fd
+                        path to the fd(1) command if not specified in $PATH
   -H, --hidden          show hidden files; the default is not to show hidden files
   -i IGNORE_FILE, --ignore-file IGNORE_FILE
                         path to the Git-format ignore file for search exclusions, optional
