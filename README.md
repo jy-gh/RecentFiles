@@ -20,7 +20,15 @@ You must have [Alfred's Powerpack](https://www.alfredapp.com/powerpack/) install
 
 In addition, the `fd` command is required to run both the **Recent Files** workflow and the **recent_files** command-line utility. Both the **Recent Files** workflow and the **recent_files** command-line utility will attempt to use the `fd` command that is present in your `$PATH`.
 
-In the event that `fd` is not installed on your system, it can be installed from a variety of sources, including [MacPorts](https://www.macports.org/), [Brew](https://brew.sh/), and [GitHub](https://github.com/sharkdp/fd).
+It's possible to confirm that `fd` is installed by entering the following commands in a Terminal window:
+
+`which fd`
+
+If the message *fd not found* is displayed it will be necessary to install it in order to use **Recent Files**/**recent_files**. `fd` can be installed from a variety of sources, including:
+
+* [MacPorts](https://www.macports.org/)
+* [Brew](https://brew.sh/)
+* [GitHub](https://github.com/sharkdp/fd)
 
 ### Python 3
 
@@ -42,7 +50,7 @@ Python 3.x may be installed using any of the following:
 
 ### Installation
 
-Download the workflow file and double-click on it to install it. During installation Alfred will display the [Workflow Configuration](#Workflow-Configuration) values.
+Download the workflow file and double-click on it to install it. During installation Alfred will display the [Workflow Configuration](#Workflow-Configuration) values screen.
 
 ### Usage
 
@@ -60,9 +68,13 @@ The behavior of **Recent Files** may be configured by selecting the workflow and
 |`FD_COMMAND`|fd|Path to the `fd` command. By default, the workflow will use the `fd` found in the `$PATH` variable.|
 |`TOP_LEVEL_DIRECTORY`|~|Top level directory to search from. The ~ (tilde) specifies the user's `$HOME` directory.|
 |`IGNORE_FILE`|`example_ignore_file.txt`|File to use as an ignore file; see [Ignore Files](#Ignore-Files).|
-|`MAX_RESULTS`|20|Maximum number of results to display in Alfred.|
+|`FILETYPE`|f|This can be set to either **Files only**, **Directories only**, or to **Both files and directories**.|
 |`CHANGED_WITHIN`|7d|Show items added/changed within a time period. The default is `7d` (seven days); other units may be used, such as min (minutes), h (hours), and w (weeks). A value of `12h`, for example, would only return files created or modified the previous 12 hours.|
-|`FILETYPE`|f|File types to display; valid types include f for files, d for directories. These arguments can be combined, so a FILETYPE value of `df` will show both directories and files.|
+|`MAX_RESULTS`|20|Maximum number of results to display in Alfred.|
+|`JSON_DIR_TITLE`|name|If set to **name**, display only the name of the directory as the title (first line) of results. If set to **path**, display the full path to the directory as the title of the results. The subtitle will always display the full **path** to the directory. (Using **name** is less visually cluttered--and more consistent with Alfred's display style.)|
+|`JSON_FILE_TITLE`|name|If set to **name**, display only the name of the file as the title (first line) of results. If set to **path**, display the full path to the file as the title of the results. The subtitle will always display the full **path** to the file. (Using **name** is less visually cluttered--and more consistent with Alfred's display style.)|
+|`FOLLOW_LINKS`|Ignore|If set to **Ignore**, searches will not traverse symbolically linked directories. If set to **Follow**, symbolically linked directories will be searched for results. Note that it's possible to create a directory structure using symbolic links that would cause the display of duplicate results.|
+|`SHOW_HIDDEN`|Ignore|If set to **Ignore**, hidden files (files beginning with the dot ('.') character) will not be displayed. If set to **Show**, hidden files will be displayed in results. Note that if this option is set to **Show** it's possible to display results that would have been ignored by the `IGNORE_FILE`, as the `IGNORE_FILE` has lower precedence to the `fd` command than the hidden files option.|
 
 ## **recent_files**, the command-line utility
 
@@ -77,32 +89,53 @@ To use **recent_files** as a standalone utility, copy it to a directory in your 
 When invoked with `-h`, the following usage message is displayed:
 
 ```
-usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIR] [--fd-command FD_COMMAND] [-H]
-                    [-i IGNORE_FILE] [-m MAX_RESULTS] [-o {text,json}] [--reverse]
-                    [-t FILETYPES]
+usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIRS]
+                    [--fd-command FD_COMMAND] [-H] [-i IGNORE_FILE]
+                    [--json-dir-title {name,path}]
+                    [--json-file-title {name,path}] [-L] [-m MAX_RESULTS]
+                    [-o {text,json}] [--reverse] [-t FILETYPES]
 
 Finds recent files
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -c CHANGED_WITHIN, --changed-within CHANGED_WITHIN
                         changed within 1h, 2d, 5min, etc.; the default is 7d
-  -d DIR, --dir DIR     directory to start search from; the default is the current directory
+  -d DIRS, --dir DIRS   the directory/directories to search (multiple -d
+                        arguments are allowed); the default is the current
+                        directory
   --fd-command FD_COMMAND
                         path to the fd(1) command if not specified in $PATH
-  -H, --hidden          show hidden files; the default is not to show hidden files
+  -H, --hidden          show hidden files; the default is not to show hidden
+                        files
   -i IGNORE_FILE, --ignore-file IGNORE_FILE
-                        path to the Git-format ignore file for search exclusions, optional
+                        path to the Git-format ignore file for search
+                        exclusions, optional
+  --json-dir-title {name,path}
+                        in JSON (only), display only the directory name as
+                        title; 'path' displays the full pathname to the
+                        directory
+  --json-file-title {name,path}
+                        in JSON (only), display only the filename as title;
+                        'path' displays the full pathname
+  -L, --follow-links    Traverse symbolically linked directories; default is
+                        to ignore them
   -m MAX_RESULTS, --max-results MAX_RESULTS
-                        only return MAX_RESULTS items; the default is to return all results
+                        only return MAX_RESULTS items; the default is to
+                        return all results
   -o {text,json}, --output-format {text,json}
-                        output format, default is text; json is for use by Alfred
-  --reverse             reverse the sorting order; the default is newest files first
+                        output format, default is text; json is for use by
+                        Alfred
+  --reverse             reverse the sorting order; the default is newest files
+                        first
   -t FILETYPES, --filetype FILETYPES
-                        filetype, as supported by fd; the default is "f"; the argument may be
-                        repeated or combined, so both (1) and (2) are allowed: (1) --filetype
-                        fd (2) --filetype f --filetype d
+                        filetype, as supported by fd; the default is "f"; the
+                        argument may be repeated or combined, so both (1) and
+                        (2) are allowed: (1) --filetype fd (2) --filetype f
+                        --filetype d
 ```
+
+Note that several of these options are intended for the **Recent Files** Alfred workflow and are probably not useful for command line usage, including `-o`, `--json-dir-title`, and `--json-file-title`.
 
 ### Command-line examples
 
@@ -118,11 +151,23 @@ List files modified in the past week, in the Documents directory and subdirector
 
 `recent_files -c 1w --dir ~/Documents`
 
+List files modified in the past week, in the Documents directory, the Downloads directory, and their subdirectories (the two commands are equivalent):
+
+`recent_files -c 1w --dir ~/Documents --dir ~/Downloads`
+
+`recent_files -c 1w --dir '~/Documents:~/Downloads'`
+
+Note that in the second example above single quotes were used to protect the argument to `--dir`; this is especially important if the path contains spaces or shell metacharacters.
+
 List files modified in the past hour, including hidden files:
 
 `recent_files -c 1h -H`
 
-Use a custom ignore file, display results in reverse order (oldest item first):
+List files modified in the past hour, including files in symbolically linked subdirectories:
+
+`recent_files -c 1h -L`
+
+Use a custom ignore file and display results in reverse order (oldest item first):
 
 `recent_files --ignore-file ~/my_ignore_file --reverse`
 
@@ -145,7 +190,7 @@ Icon?
 *.tvlibrary
 ```
 
-This ignore file will cause `fd` to ignore files in the Library folder, Icon files with embedded carriage returns, files beginning with the '~' character (often used for temporary files), and files with .photoslibrary, .musiclibrary, and .tvlibrary extensions. Files matched in an ignore file will not be returned as results.
+This ignore file will cause `fd` to ignore files in the Library folder, Icon files with embedded carriage returns, files beginning with the '~' character (often used for temporary files), and files with `.photoslibrary`, `.musiclibrary`, and `.tvlibrary` extensions. Files matched in an ignore file will not be returned as results unless another option (such as `-H`) takes precedence.
 
 If this file was named `my_ignore_file` and put in the `$HOME` directory, the following command line would allow **recent_files** to use it:
 
@@ -164,22 +209,22 @@ See [Script Filter JSON Format](https://www.alfredapp.com/help/workflows/inputs/
   "items": [
     {
       "type": "file",
-      "title": "/Users/jy/Documents/foo.txt",
-      "subtitle": "/Users/jy/Documents/foo.txt",
-      "arg": "/Users/jy/Documents/foo.txt",
+      "title": "foo.txt",
+      "subtitle": "/Users/testuser/Documents/foo.txt",
+      "arg": "/Users/testuser/Documents/foo.txt",
       "icon": {
         "type": "fileicon",
-        "path": "/Users/jy/Documents/foo.txt"
+        "path": "/Users/testuser/Documents/foo.txt"
       }
     },
     {
       "type": "file",
-      "title": "/Users/jy/Documents/bar.txt",
-      "arg": "/Users/jy/Documents/bar.txt"
-      "subtitle": "/Users/jy/Documents/bar.txt",
+      "title": "bar.txt",
+      "arg": "/Users/testuser/Documents/bar.txt"
+      "subtitle": "/Users/testuser/Documents/bar.txt",
       "icon": {
         "type": "fileicon",
-        "path": "/Users/jy/Documents/bar.txt"
+        "path": "/Users/testuser/Documents/bar.txt"
       }
     }
   ]
@@ -212,6 +257,22 @@ For the **recent_files** command-line utility, do the following:
 
 Add the `--ignore-file` argument to the command. See [Ignore Files](#Ignore-Files).
 
+### Use multiple directories in the search
+
+It's sometimes easier to specify the directories to include for searches than it is to filter out directories via [Ignore Files](#Ignore-Files).
+
+These commands are equivalent:
+
+```
+recent_files -c 1w --dir ~/Documents --dir ~/Downloads --dir $HOME/Pictures
+# OR
+recent_files -c 1w --dir '~/Documents:~/Downloads:$HOME/Pictures'
+```
+
+The second version (using the colon-separated list of directories) may also be used in the [Workflow Configuration](#Workflow-Configuration) for the **Recent Files** workflow.
+
+Note that any environment variable referenced must be defined; this is straightforward when using **recent_files** from the command line, but it's trickier when using the **Recent Files** workflow. ($HOME is a special case that should be defined at all times.) See [Understanding the Scripting Environment](https://www.alfredapp.com/help/workflows/advanced/understanding-scripting-environment/) for an introduction to the issue.
+
 ### Limit the number of returned results
 
 See the [Workflow Configuration](#Workflow-Configuration) section for information on changing the `MAX_RESULTS` value in the **Recent Files** workflow.
@@ -228,13 +289,13 @@ See the [Workflow Configuration](#Workflow-Configuration) section for informatio
 
 For the **recent_files** command-line utility, do the following:
 
-Add the `--directory` argument to the command.
+Add one or more `--directory` arguments to the command.
 
 ## Acknowledgements
 
 This workflow was inspired by Hans Raaf's Alfred workflow, [*Last changed files*](https://github.com/oderwat/alfredworkflows).
 
-Thanks to @vitorgalvao for multiple enhancement suggestions.
+Thanks to @vitorgalvao for multiple enhancement suggestions. Recent changes, including the `-L` option, processing multiple colon-separated directories, and the changes to the **Recent Files** workflow default display are the result of issues and discussions with @chumido and @saeedesmaili--thanks to both of them.
 
 ## Copyright
 
