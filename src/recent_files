@@ -9,6 +9,7 @@ import argparse
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -25,9 +26,6 @@ class FindRecentFiles:
 
         self._parse_arguments()
         self.filetypes = set()
-
-        if self.arguments["dir"] is None:
-            self.arguments["dir"] = os.getcwd()
 
         if self.arguments["filetypes"] is None:
             self.filetypes.add(FD_DEFAULT_FILETYPE)
@@ -68,7 +66,9 @@ class FindRecentFiles:
             "-d",
             "--dir",
             required=False,
-            help="directory to start search from; the default is the current directory",
+            dest="dirs",
+            action='append',
+            help="the directory/directories to search (multiple -d arguments are allowed); the default is the current directory",
         )
         parser.add_argument(
             "--fd-command",
@@ -93,6 +93,33 @@ class FindRecentFiles:
             type=str,
             required=False,
             help="path to the Git-format ignore file for search exclusions, optional",
+        )
+        parser.add_argument(
+            "--json-dir-title",
+            dest="json_dir_title",
+            type=str,
+            default="name",
+            choices=["name", "path"],
+            required=False,
+            help="in JSON (only), display only the directory name as title; 'path' displays the full pathname to the directory",
+        )
+        parser.add_argument(
+            "--json-file-title",
+            dest="json_file_title",
+            type=str,
+            default="name",
+            choices=["name", "path"],
+            required=False,
+            help="in JSON (only), display only the filename as title; 'path' displays the full pathname",
+        )
+        parser.add_argument(
+            "-L",
+            "--follow-links",
+            dest="follow_links",
+            default=False,
+            action="store_true",
+            required=False,
+            help="Traverse symbolically linked directories; default is to ignore them",
         )
         parser.add_argument(
             "-m",
@@ -156,6 +183,19 @@ class FindRecentFiles:
         if "show_hidden" in self.arguments and self.arguments["show_hidden"]:
             options.append("-H")
 
+        if 'follow_links' in self.arguments and self.arguments["follow_links"]:
+            options.append("-L")
+
+        if 'dirs' not in self.arguments or self.arguments['dirs'] is None:
+            options.append('--search-path')
+            options.append(os.getcwd())
+        else:
+            split_dirs = [re.split(r':', x) for x in self.arguments['dirs']]
+            dirlist = [item for sublist in split_dirs for item in sublist]
+            for dir in dirlist:
+                options.append('--search-path')
+                options.append(os.path.expandvars(os.path.expanduser(dir)))
+
         return options
 
     def find_recent_files(self):
@@ -166,8 +206,7 @@ class FindRecentFiles:
         try:
             result = subprocess.Popen(
                 [self.arguments["fd_command"], *options],
-                stdout=subprocess.PIPE,
-                cwd=self.arguments["dir"],
+                stdout=subprocess.PIPE
             )
         except FileNotFoundError:
             print("Error: the fd command does not exist or is not executable!")
@@ -193,7 +232,7 @@ class FindRecentFiles:
         return files
 
     @staticmethod
-    def create_json(sorted_list, max_results):
+    def create_json(sorted_list, max_results, json_dir_title="name", json_file_title="name"):
         """Prepare and return JSON output"""
         files = []
         result_count = 0
@@ -206,9 +245,25 @@ class FindRecentFiles:
             result_count += 1
 
             filename = list_item[0]
+            if os.path.isfile(filename):
+                if json_file_title == 'name':
+                    title = os.path.basename(filename)
+                else:
+                    title = filename
+            elif os.path.isdir(filename):
+                if json_dir_title == 'name':
+                    if filename[-1] == '/':
+                        title = os.path.basename(filename[0:-1])
+                    else:
+                        title = os.path.basename(filename)
+                else:
+                    title = filename
+            else:
+                title = filename
+
             record = {
                 "type": "file",
-                "title": filename,
+                "title": title,
                 "subtitle": filename,
                 "arg": filename,
                 "icon": {"type": "fileicon", "path": filename},
@@ -240,7 +295,12 @@ class FindRecentFiles:
                              key=lambda x: x[1],
                              reverse=self.arguments["reverse_sort"])
         if self.arguments["output_format"] == "json":
-            self.create_json(sorted_list, self.arguments["max_results"])
+            self.create_json(
+                sorted_list,
+                self.arguments["max_results"],
+                self.arguments["json_dir_title"],
+                self.arguments["json_file_title"]
+            )
         else:
             self.create_text(sorted_list, self.arguments["max_results"])
 
