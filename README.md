@@ -69,6 +69,7 @@ The behavior of **Recent Files** may be configured by selecting the workflow and
 |`TOP_LEVEL_DIRECTORY`|~|Top level directory to search from. The ~ (tilde) specifies the user's `$HOME` directory.|
 |`IGNORE_FILE`|`example_ignore_file.txt`|File to use as an ignore file; see [Ignore Files](#Ignore-Files).|
 |`FILETYPE`|f|This can be set to either **Files only**, **Directories only**, or to **Both files and directories**.|
+|`EXTENSIONS`|:|One or more colon-separated file/directory extensions, such as `pdf`, `md`, etc. Dots are not required.|
 |`CHANGED_WITHIN`|7d|Show items added/changed within a time period. The default is `7d` (seven days); other units may be used, such as min (minutes), h (hours), and w (weeks). A value of `12h`, for example, would only return files created or modified the previous 12 hours.|
 |`MAX_RESULTS`|20|Maximum number of results to display in Alfred.|
 |`JSON_DIR_TITLE`|name|If set to **name**, display only the name of the directory as the title (first line) of results. If set to **path**, display the full path to the directory as the title of the results. The subtitle will always display the full **path** to the directory. (Using **name** is less visually cluttered--and more consistent with Alfred's display style.)|
@@ -89,7 +90,7 @@ To use **recent_files** as a standalone utility, copy it to a directory in your 
 When invoked with `-h`, the following usage message is displayed:
 
 ```
-usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIRS]
+usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIRS] [-e EXTS]
                     [--fd-command FD_COMMAND] [-H] [-i IGNORE_FILE]
                     [--json-dir-title {name,path}]
                     [--json-file-title {name,path}] [-L] [-m MAX_RESULTS]
@@ -104,6 +105,10 @@ options:
   -d DIRS, --dir DIRS   the directory/directories to search (multiple -d
                         arguments are allowed); the default is the current
                         directory
+  -e EXTS, --extension EXTS
+                        file extensions to search (multiple -e arguments are
+                        allowed); the default is to search all file/directory
+                        extensions
   --fd-command FD_COMMAND
                         path to the fd(1) command if not specified in $PATH
   -H, --hidden          show hidden files; the default is not to show hidden
@@ -150,6 +155,12 @@ List files and directories modified within the past three days:
 List files modified in the past week, in the Documents directory and subdirectories:
 
 `recent_files -c 1w --dir ~/Documents`
+
+List `pdf`, `md`, and `txt` files modified in the past day, in the Documents directory and subdirectories (the two commands are equivalent):
+
+`recent_files -c 1d -e pdf --extension md -e txt --dir ~/Documents`
+
+`recent_files -c 1d -e pdf:md:txt --dir ~/Documents`
 
 List files modified in the past week, in the Documents directory, the Downloads directory, and their subdirectories (the two commands are equivalent):
 
@@ -291,11 +302,17 @@ For the **recent_files** command-line utility, do the following:
 
 Add one or more `--directory` arguments to the command.
 
+### See only files/directories with specific extensions
+
+Add one or more `-e/--extension` arguments to the command. A single, colon-separated argument may be used as well, so `--extension pdf:md:html` is equivalent to `-e pdf --extension md -e html`.
+
 ## Acknowledgements
 
 This workflow was inspired by Hans Raaf's Alfred workflow, [*Last changed files*](https://github.com/oderwat/alfredworkflows).
 
 Thanks to @vitorgalvao for multiple enhancement suggestions. Recent changes, including the `-L` option, processing multiple colon-separated directories, and the changes to the **Recent Files** workflow default display are the result of issues and discussions with @chumido and @saeedesmaili--thanks to both of them.
+
+The `-e/--extension` argument, as well as the addition of different Action Modifiers in the Alfred workflow, were prompted by discussions with @NicholasSloan--thanks Nick!
 
 ## Copyright
 
