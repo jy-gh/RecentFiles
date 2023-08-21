@@ -71,6 +71,14 @@ class FindRecentFiles:
             help="the directory/directories to search (multiple -d arguments are allowed); the default is the current directory",
         )
         parser.add_argument(
+            "-e",
+            "--extension",
+            required=False,
+            dest="exts",
+            action='append',
+            help="file extensions to search (multiple -e arguments are allowed); the default is to search all file/directory extensions",
+        )
+        parser.add_argument(
             "--fd-command",
             dest="fd_command",
             type=str,
@@ -186,6 +194,15 @@ class FindRecentFiles:
         if 'follow_links' in self.arguments and self.arguments["follow_links"]:
             options.append("-L")
 
+        if 'exts' in self.arguments and self.arguments['exts'] is not None:
+            split_exts = [re.split(r':', x) for x in self.arguments['exts']]
+            if len(split_exts) > 0:
+                exts = [elem.strip() for y in split_exts for elem in y]
+                for extension in exts:
+                    if extension != '':
+                        options.append("--extension")
+                        options.append(extension)
+
         if 'dirs' not in self.arguments or self.arguments['dirs'] is None:
             options.append('--search-path')
             options.append(os.getcwd())
@@ -212,7 +229,6 @@ class FindRecentFiles:
             print("Error: the fd command does not exist or is not executable!")
             print("  " + self.arguments["fd_command"])
             sys.exit(1)
-
 
         for line in io.TextIOWrapper(result.stdout, encoding="utf-8"):
 
