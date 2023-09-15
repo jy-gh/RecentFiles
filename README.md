@@ -58,6 +58,16 @@ Download the workflow file and double-click on it to install it. During installa
 
 After invocation, **Recent Files** will display the list of results in Alfred where any allowed action (open/move/delete/preview, etc.) may be performed. By default, this search starts at the user's `$HOME` directory—although this can be changed, see [Workflow Configuration](#Workflow-Configuration)—and includes files in subdirectories.
 
+Note that modifier keys (Control, Command, and Option) may be held down to quickly select the following commonly used Alfred actions:
+
+|Modifier Key|Action|
+|---------|--------|
+|Command|Reveal File in Finder|
+|Option|Open Terminal Here|
+|Control|Open with|
+
+Note that the Shift modifier key is not used, as Alfred can use it to Quick Look the selected item. See Alfred's Preferences (Features -> Previews panel) to enable or disable this feature.
+
 ### Workflow Configuration
 
 The behavior of **Recent Files** may be configured by selecting the workflow and clicking on the `Configure Workflow` button in Alfred. Here are the values that can changed from that screen:
@@ -94,11 +104,12 @@ usage: recent_files [-h] [-c CHANGED_WITHIN] [-d DIRS] [-e EXTS]
                     [--fd-command FD_COMMAND] [-H] [-i IGNORE_FILE]
                     [--json-dir-title {name,path}]
                     [--json-file-title {name,path}] [-L] [-m MAX_RESULTS]
-                    [-o {text,json}] [--reverse] [-t FILETYPES]
+                    [-o {text,json}] [--relative-path] [--reverse]
+                    [-t FILETYPES] [--version]
 
 Finds recent files
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   -c CHANGED_WITHIN, --changed-within CHANGED_WITHIN
                         changed within 1h, 2d, 5min, etc.; the default is 7d
@@ -131,6 +142,8 @@ options:
   -o {text,json}, --output-format {text,json}
                         output format, default is text; json is for use by
                         Alfred
+  --relative-path       display relative file/directory paths; the default is
+                        to display absolute paths
   --reverse             reverse the sorting order; the default is newest files
                         first
   -t FILETYPES, --filetype FILETYPES
@@ -138,6 +151,8 @@ options:
                         argument may be repeated or combined, so both (1) and
                         (2) are allowed: (1) --filetype fd (2) --filetype f
                         --filetype d
+  --version             print version information
+
 ```
 
 Note that several of these options are intended for the **Recent Files** Alfred workflow and are probably not useful for command line usage, including `-o`, `--json-dir-title`, and `--json-file-title`.
@@ -177,6 +192,10 @@ List files modified in the past hour, including hidden files:
 List files modified in the past hour, including files in symbolically linked subdirectories:
 
 `recent_files -c 1h -L`
+
+List files modified in the past 30 minutes, using relative paths:
+
+`recent_files -c 30m --relative-path`
 
 Use a custom ignore file and display results in reverse order (oldest item first):
 
@@ -312,7 +331,13 @@ This workflow was inspired by Hans Raaf's Alfred workflow, [*Last changed files*
 
 Thanks to @vitorgalvao for multiple enhancement suggestions. Recent changes, including the `-L` option, processing multiple colon-separated directories, and the changes to the **Recent Files** workflow default display are the result of issues and discussions with @chumido and @saeedesmaili--thanks to both of them.
 
+### v0.9.0
+
 The `-e/--extension` argument, as well as the addition of different Action Modifiers in the Alfred workflow, were prompted by discussions with @NicholasSloan--thanks Nick!
+
+### v0.9.1
+
+Thanks to @NicholasSloan for the new workflow icon!
 
 ## Copyright
 
